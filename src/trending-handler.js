@@ -1,14 +1,24 @@
-const trendingcontents = require('./trending-contents')
 const { nanoid } = require('nanoid')
+const mysql = require('mysql')
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'equaliteach_db'
+})
+
+connection.connect((error) => {
+  if (error) {
+    console.error('Error connecting to the database:', error)
+    return
+  }
+  console.log('Connected to the database')
+})
 
 const addtrendingcontentHandler = (request, h) => {
   const { name, description, image } = request.payload
-
   const id = nanoid(16)
-
-  const newtrendingcontent = {
-    id, name, description, image
-  }
+  const newcontent = { id, name, description, image }
 
   if (!name) {
     const response = h.response({
@@ -19,56 +29,91 @@ const addtrendingcontentHandler = (request, h) => {
     return response
   }
 
-  trendingcontents.push(newtrendingcontent)
-
-  const isSuccess = trendingcontents.filter((trendingcontent) => trendingcontent.id === id).length > 0
-
-  if (isSuccess) {
-    const response = h.response({
-      status: 'success',
-      message: 'Konten berhasil ditambahkan',
-      trendingcontents
+  return new Promise((resolve, reject) => {
+    connection.query('INSERT INTO trending SET ?', newcontent, (error, results) => {
+      if (error) {
+        console.error('Error inserting content into the database:', error)
+        const response = h.response({
+          status: 'fail',
+          message: 'Konten gagal ditambahkan'
+        })
+        response.code(500)
+        reject(response) // Reject the promise with the error response
+      } else {
+        const response = h.response({
+          status: 'success',
+          message: 'Konten berhasil ditambahkan',
+          content: newcontent
+        })
+        response.code(201)
+        resolve(response) // Resolve the promise with the success response
+      }
     })
-    response.code(201)
-    return response
-  }
-
-  const response = h.response({
-    status: 'fail',
-    message: 'Konten gagal ditambahkan'
+  }).catch((errorResponse) => {
+    return errorResponse
   })
-  response.code(500)
-  return response
 }
 
-const getAlltrendingcontentsHandler = () => ({
-  status: 'success',
-  trendingcontents
-})
+const getAlltrendingcontentsHandler = (request, h) => {
+  return new Promise((resolve, reject) => {
+    connection.query('SELECT * FROM trending', (error, results) => {
+      if (error) {
+        console.error('Error retrieving contents from the database:', error)
+        const response = h.response({
+          status: 'fail',
+          message: 'Gagal mengambil Konten'
+        })
+        response.code(500)
+        reject(response)
+      }
+
+      const response = h.response({
+        status: 'success',
+        contents: results
+      })
+      response.code(200)
+      resolve(response)
+    })
+  })
+}
 
 const gettrendingcontentByIdHandler = (request, h) => {
   const { id } = request.params
 
-  const trendingcontent = trendingcontents.filter((b) => b.id === id)[0]
-
-  if (trendingcontent !== undefined) {
-    return {
-      status: 'success',
-      trendingcontent
-    }
-  }
-
-  const response = h.response({
-    status: 'fail',
-    message: 'Konten tidak ditemukan'
+  return new Promise((resolve, reject) => {
+    connection.query('SELECT * FROM trending WHERE id = ?', id, (error, results) => {
+      if (error) {
+        console.error('Error retrieving content from the database:', error)
+        const response = h.response({
+          status: 'fail',
+          message: 'Gagal mengambil Konten'
+        })
+        response.code(500)
+        reject(response)
+      } else if (results.length > 0) {
+        const content = results[0]
+        const response = h.response({
+          status: 'success',
+          content
+        })
+        response.code(200)
+        resolve(response)
+      } else {
+        const response = h.response({
+          status: 'fail',
+          message: 'Konten tidak ditemukan'
+        })
+        response.code(404)
+        resolve(response)
+      }
+    })
+  }).catch((errorResponse) => {
+    return errorResponse
   })
-  response.code(404)
-  return response
 }
 
 const edittrendingcontentByIdHandler = (request, h) => {
   const { id } = request.params
-
   const { name, description, image } = request.payload
 
   if (!name) {
@@ -80,52 +125,75 @@ const edittrendingcontentByIdHandler = (request, h) => {
     return response
   }
 
-  const index = trendingcontents.findIndex((trendingcontent) => trendingcontent.id === id)
-
-  if (index !== -1) {
-    trendingcontents[index] = {
-      ...trendingcontents[index],
-      name,
-      description,
-      image
-    }
-    const response = h.response({
-      status: 'success',
-      message: 'Konten berhasil diperbarui'
-    })
-    response.code(200)
-    return response
+  const updatedContent = {
+    name,
+    description,
+    image
   }
 
-  const response = h.response({
-    status: 'fail',
-    message: 'Gagal memperbarui Konten. Id tidak ditemukan'
+  return new Promise((resolve, reject) => {
+    connection.query('UPDATE trending SET ? WHERE id = ?', [updatedContent, id], (error, results) => {
+      if (error) {
+        console.error('Error updating content in the database:', error)
+        const response = h.response({
+          status: 'fail',
+          message: 'Gagal memperbarui Konten'
+        })
+        response.code(500)
+        reject(response) // Reject the promise with the error response
+      } else if (results.affectedRows > 0) {
+        const response = h.response({
+          status: 'success',
+          message: 'Konten berhasil diperbarui'
+        })
+        response.code(200)
+        resolve(response) // Resolve the promise with the success response
+      } else {
+        const response = h.response({
+          status: 'fail',
+          message: 'Gagal memperbarui Konten. Id tidak ditemukan'
+        })
+        response.code(404)
+        resolve(response) // Resolve the promise with the not found response
+      }
+    })
+  }).catch((errorResponse) => {
+    return errorResponse
   })
-  response.code(404)
-  return response
 }
 
 const deletetrendingcontentByIdHandler = (request, h) => {
   const { id } = request.params
 
-  const index = trendingcontents.findIndex((trendingcontent) => trendingcontent.id === id)
-
-  if (index !== -1) {
-    trendingcontents.splice(index, 1)
-    const response = h.response({
-      status: 'success',
-      message: 'Konten berhasil dihapus'
+  return new Promise((resolve, reject) => {
+    connection.query('DELETE FROM trending WHERE id = ?', id, (error, results) => {
+      if (error) {
+        console.error('Error deleting content from the database:', error)
+        const response = h.response({
+          status: 'fail',
+          message: 'Gagal menghapus Konten'
+        })
+        response.code(500)
+        reject(response) // Reject the promise with the error response
+      } else if (results.affectedRows > 0) {
+        const response = h.response({
+          status: 'success',
+          message: 'Konten berhasil dihapus'
+        })
+        response.code(200)
+        resolve(response) // Resolve the promise with the success response
+      } else {
+        const response = h.response({
+          status: 'fail',
+          message: 'Konten gagal dihapus. Id tidak ditemukan'
+        })
+        response.code(404)
+        resolve(response) // Resolve the promise with the not found response
+      }
     })
-    response.code(200)
-    return response
-  }
-
-  const response = h.response({
-    status: 'fail',
-    message: 'Konten gagal dihapus. Id tidak ditemukan'
+  }).catch((errorResponse) => {
+    return errorResponse
   })
-  response.code(404)
-  return response
 }
 
 module.exports = {
