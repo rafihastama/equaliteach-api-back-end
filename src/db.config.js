@@ -1,6 +1,6 @@
 const mysql = require('mysql')
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   MYSQLHOST: 'containers-us-west-107.railway.app',
   MYSQLUSER: 'root',
   MYSQLPASSWORD: 'YX2gWv2bVXnAtDGCjQrq',
