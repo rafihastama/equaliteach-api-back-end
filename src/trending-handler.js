@@ -1,10 +1,10 @@
 const { nanoid } = require('nanoid')
 const mysql = require('mysql')
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'equaliteach_db'
+  MYSQLHOST: 'localhost',
+  MYSQLUSER: 'root',
+  MYSQLPASSWORD: '',
+  MYSQLDATABASE: 'equaliteach_db'
 })
 
 connection.connect((error) => {
