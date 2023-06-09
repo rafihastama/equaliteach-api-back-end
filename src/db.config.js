@@ -1,12 +1,12 @@
 const mysql = require('mysql')
 
 const connection = mysql.createConnection({
-  MYSQLHOST: 'containers-us-west-107.railway.app',
-  MYSQLUSER: 'root',
-  MYSQLPASSWORD: 'YX2gWv2bVXnAtDGCjQrq',
-  MYSQLDATABASE: 'railway',
-  MYSQLPORT: 5880,
-  MYSQL_URL: 'mysql://root:YX2gWv2bVXnAtDGCjQrq@containers-us-west-107.railway.app:5880/railway'
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 5580,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  url: process.env.DB_URL
 })
 
 connection.connect((error) => {
