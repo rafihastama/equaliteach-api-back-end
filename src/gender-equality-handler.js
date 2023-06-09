@@ -4,7 +4,7 @@ const connection = mysql.createConnection({
   MYSQLHOST: 'localhost',
   MYSQLUSER: 'root',
   MYSQLPASSWORD: '',
-  MYSQLDATABASE: 'equaliteach_db
+  MYSQLDATABASE: 'railway'
 })
 
 connection.connect((error) => {

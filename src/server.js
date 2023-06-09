@@ -3,7 +3,7 @@ const routes = require('./routes')
 
 const init = async () => {
   const server = Hapi.server({
-    MYSQLPORT: 3000,
+    MYSQLPORT: process.env.PORT || 3000,
     MYSQLHOST: 'localhost',
     routes: {
       cors: {
