@@ -7,7 +7,7 @@ const init = async () => {
     host: '0.0.0.0',
     routes: {
       cors: {
-        origin: '*'
+        origin: ['*']
       }
     }
   })
