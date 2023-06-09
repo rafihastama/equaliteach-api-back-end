@@ -1,7 +1,7 @@
 const { nanoid } = require('nanoid')
 const mysql = require('mysql')
 const connection = mysql.createConnection({
-  MYSQLHOST: 'localhost',
+  MYSQLHOST: 'containers-us-west-107.railway.app',
   MYSQLUSER: 'root',
   MYSQLPASSWORD: '',
   MYSQLDATABASE: 'railway'
