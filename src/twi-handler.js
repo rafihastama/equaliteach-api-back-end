@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid')
-const connection = require('./db.config')
+const pool = require('./db.config')
 
 const addtwicontentHandler = (request, h) => {
   const { name, description, image } = request.payload
@@ -16,7 +16,7 @@ const addtwicontentHandler = (request, h) => {
   }
 
   return new Promise((resolve, reject) => {
-    connection.query('INSERT INTO twi SET ?', newcontent, (error, results) => {
+    pool.query('INSERT INTO twi SET ?', newcontent, (error, results) => {
       if (error) {
         console.error('Error inserting content into the database:', error)
         const response = h.response({
@@ -42,7 +42,7 @@ const addtwicontentHandler = (request, h) => {
 
 const getAlltwicontentsHandler = (request, h) => {
   return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM twi', (error, results) => {
+    pool.query('SELECT * FROM twi', (error, results) => {
       if (error) {
         console.error('Error retrieving contents from the database:', error)
         const response = h.response({
@@ -67,7 +67,7 @@ const gettwicontentByIdHandler = (request, h) => {
   const { id } = request.params
 
   return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM twi WHERE id = ?', id, (error, results) => {
+    pool.query('SELECT * FROM twi WHERE id = ?', id, (error, results) => {
       if (error) {
         console.error('Error retrieving content from the database:', error)
         const response = h.response({
@@ -118,7 +118,7 @@ const edittwicontentByIdHandler = (request, h) => {
   }
 
   return new Promise((resolve, reject) => {
-    connection.query('UPDATE twi SET ? WHERE id = ?', [updatedContent, id], (error, results) => {
+    pool.query('UPDATE twi SET ? WHERE id = ?', [updatedContent, id], (error, results) => {
       if (error) {
         console.error('Error updating content in the database:', error)
         const response = h.response({
@@ -152,7 +152,7 @@ const deletetwicontentByIdHandler = (request, h) => {
   const { id } = request.params
 
   return new Promise((resolve, reject) => {
-    connection.query('DELETE FROM twi WHERE id = ?', id, (error, results) => {
+    pool.query('DELETE FROM twi WHERE id = ?', id, (error, results) => {
       if (error) {
         console.error('Error deleting content from the database:', error)
         const response = h.response({

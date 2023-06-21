@@ -1,6 +1,7 @@
 const mysql = require('mysql')
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
+  connectionLimit: 10,
   host: process.env.DB_HOST,
   port: process.env.DB_PORT || 6020,
   user: process.env.DB_USER,
@@ -9,7 +10,7 @@ const connection = mysql.createConnection({
   url: process.env.DB_URL
 })
 
-connection.connect((error) => {
+pool.getConnection((error, connection) => {
   if (error) {
     console.error('Error connecting to the database:', error)
     return
@@ -17,4 +18,4 @@ connection.connect((error) => {
   console.log('Connected to the database')
 })
 
-module.exports = connection
+module.exports = pool

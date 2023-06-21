@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid')
-const connection = require('./db.config')
+const pool = require('./db.config')
 
 const addcontentHandler = (request, h) => {
   const { name, description, image } = request.payload
@@ -16,7 +16,7 @@ const addcontentHandler = (request, h) => {
   }
 
   return new Promise((resolve, reject) => {
-    connection.query('INSERT INTO gender_equality SET ?', newcontent, (error, results) => {
+    pool.query('INSERT INTO gender_equality SET ?', newcontent, (error, results) => {
       if (error) {
         console.error('Error inserting content into the database:', error)
         const response = h.response({
@@ -42,7 +42,7 @@ const addcontentHandler = (request, h) => {
 
 const getAllcontentsHandler = (request, h) => {
   return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM gender_equality', (error, results) => {
+    pool.query('SELECT * FROM gender_equality', (error, results) => {
       if (error) {
         console.error('Error retrieving contents from the database:', error)
         const response = h.response({
@@ -67,7 +67,7 @@ const getcontentByIdHandler = (request, h) => {
   const { id } = request.params
 
   return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM gender_equality WHERE id = ?', id, (error, results) => {
+    pool.query('SELECT * FROM gender_equality WHERE id = ?', id, (error, results) => {
       if (error) {
         console.error('Error retrieving content from the database:', error)
         const response = h.response({
@@ -118,7 +118,7 @@ const editcontentByIdHandler = (request, h) => {
   }
 
   return new Promise((resolve, reject) => {
-    connection.query('UPDATE gender_equality SET ? WHERE id = ?', [updatedContent, id], (error, results) => {
+    pool.query('UPDATE gender_equality SET ? WHERE id = ?', [updatedContent, id], (error, results) => {
       if (error) {
         console.error('Error updating content in the database:', error)
         const response = h.response({
@@ -152,7 +152,7 @@ const deletecontentByIdHandler = (request, h) => {
   const { id } = request.params
 
   return new Promise((resolve, reject) => {
-    connection.query('DELETE FROM gender_equality WHERE id = ?', id, (error, results) => {
+    pool.query('DELETE FROM gender_equality WHERE id = ?', id, (error, results) => {
       if (error) {
         console.error('Error deleting content from the database:', error)
         const response = h.response({
