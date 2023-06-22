@@ -1,4 +1,5 @@
 const mysql = require('mysql')
+const fetch = require('node-fetch')
 
 const pool = mysql.createPool({
   connectionLimit: 10,
@@ -16,6 +17,32 @@ pool.getConnection((error, connection) => {
     return
   }
   console.log('Connected to the database')
+})
+
+const keepAliveInterval = setInterval(() => {
+  const endpoints = [
+    'https://equaliteach-api-back-end-production-4920.up.railway.app/gecontents',
+    'https://equaliteach-api-back-end-production-4920.up.railway.app/twicontents',
+    'https://equaliteach-api-back-end-production-4920.up.railway.app/trendingcontents'
+  ]
+
+  endpoints.forEach(endpoint => {
+    fetch(endpoint)
+      .then(response => {
+        if (response.ok) {
+          console.log(`Keep-alive request to ${endpoint} successful`)
+        } else {
+          console.error(`Keep-alive request to ${endpoint} failed`)
+        }
+      })
+      .catch(error => {
+        console.error(`Error sending keep-alive request to ${endpoint}:`, error)
+      })
+  })
+}, 475 * 60 * 1000) // 7 hours and 55 minutes in milliseconds
+
+process.on('SIGINT', () => {
+  clearInterval(keepAliveInterval)
 })
 
 module.exports = pool
