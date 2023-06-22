@@ -39,7 +39,7 @@ const keepAliveInterval = setInterval(() => {
         console.error(`Error sending keep-alive request to ${endpoint}:`, error)
       })
   })
-}, 475 * 60 * 1000) // 7 hours and 55 minutes in milliseconds
+}, 4 * 60 * 60 * 1000) // 4 hours in milliseconds
 
 process.on('SIGINT', () => {
   clearInterval(keepAliveInterval)
