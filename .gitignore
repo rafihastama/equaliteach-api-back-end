@@ -1,3 +1,6 @@
 node_modules
+.idea
 DigiCertGlobalRootG2.crt.pem
+DigiCertGlobalRootCA.crt.pem
 db.config.js
+.vscode
