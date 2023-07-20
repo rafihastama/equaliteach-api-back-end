@@ -1,14 +1,15 @@
+/* eslint-disable no-undef */
 const mysql = require('mysql')
 const fetch = require('node-fetch')
 
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 6020,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  url: process.env.DB_URL
+  host: 'equaliteach.mysql.database.azure.com',
+  user: 'lucius',
+  password: 'Caelum666?',
+  database: 'equaliteach_db',
+  port: 3306,
+  ssl: { ca: fs.readFileSync('{DigiCertGlobalRootG2.crt.pem}') }
 })
 
 pool.getConnection((error, connection) => {
