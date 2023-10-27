@@ -9,7 +9,7 @@ const addcontentHandler = (request, h) => {
   if (!name) {
     const response = h.response({
       status: 'fail',
-      message: 'Gagal menambahkan Konten. Mohon isi nama konten'
+      message: 'Gagal menambahkan Konten. Mohon isi nama konten.'
     })
     response.code(400)
     return response
